@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		#container{
+			width: 600px;
+			padding: 10px;
+			margin: 20px auto;
+		}
+		.list{
+			margin-bottom: 20px;
+		}
+		.list label{
+			width: 50px;
+			display: inline-block;
+		}
+		.list input{
+			padding: 8px;
+			width: 520px;
+			display: inline-block;
+			border-radius: 5px;
+			border:1px solid #ccc;
+		}
+		.btn{
+			text-align: center;
+		}
+		button{
+			padding: 8px 15px;
+			border:none;
+			border-radius: 5px;
+			color: #fff;
+			outline: none;
+		}
+		button:active{
+			opacity: 0.8;
+		}
+		.redBtn{
+			background: #840509;
+		}
+		.greenBtn{
+			background: #28a64e;
+		}
+		h2{
+			text-align: center;
+			padding: 10px;
+			margin-top: 20px;
+			border-bottom: 1px solid #ccc;
+		}
+		table{
+			border-collapse: collapse;
+		}
+		th,td{
+			border-bottom: 1px solid #ccc;
+			padding: 10px;
+			text-align: center;
+		}
+		.removeAll{
+			margin-top: 20px;
+			background: #0076fa;
+		}
+		.model{
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.5);
+		}
+		.edit{
+			width: 600px;
+			padding: 20px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%,-100%);
+			background: #fff;
+			border: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div class="list">
+			<label for="">姓名：</label>
+			<input type="text" placeholder="请输入姓名" v-model="formData.name">
+		</div>
+		<div class="list">
+			<label for="">年龄：</label>
+			<input type="text" placeholder="请输入年龄" v-model="formData.age">
+		</div>
+		<div class="list">
+			<label for="">性别：</label>
+			<input type="text" placeholder="请输入性别" v-model="formData.sex">
+		</div>
+		<div class="btn">
+			<button class="redBtn" @click="add">添加</button>
+			<button class="greenBtn" @click="reset">重置</button>
+		</div>
+		<h2>用户信息表</h2>
+		<table>
+			<tr>
+				<th width="100">序列</th>
+				<th width="100">姓名</th>
+				<th width="100">年龄</th>
+				<th width="100">性别</th>
+				<th width="240">操作</th>
+			</tr>
+			<tr v-for="(item,index) in items">
+				<td>{{index+1}}</td>
+				<td>{{item.name}}</td>
+				<td>{{item.age}}</td>
+				<td>{{item.sex}}</td>
+				<td>
+					<button class="greenBtn" @click="edit(index)">编辑</button>
+					<button class="redBtn" @click="remove(index)">删除</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" v-show="items.length==0">暂无数据...</td>
+			</tr>
+		</table>
+		<button class="removeAll" @click="removeAll" v-show="items.length>0">全部删除</button>
+		<div class="model" v-show="isShow">
+			<div class="edit">
+				<div class="list">
+					<label for="">姓名：</label>
+					<input type="text" placeholder="请输入姓名" v-model="modelData.name">
+				</div>
+				<div class="list">
+					<label for="">年龄：</label>
+					<input type="text" placeholder="请输入年龄" v-model="modelData.age">
+				</div>
+				<div class="list">
+					<label for="">性别：</label>
+					<input type="text" placeholder="请输入性别" v-model="modelData.sex">
+				</div>
+				<div class="btn">
+					<button class="redBtn" @click="ok(index)">确定</button>
+					<button class="greenBtn" @click="cancel">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		var vm=new Vue({
+			el:"#container",
+			data:{
+				isShow:false,
+				formData:{
+					name:'',
+					age:'',
+					sex:''
+				},
+				items:[],
+				modelData:{
+					name:'',
+					age:'',
+					sex:''
+				},
+			},
+			methods:{
+				add(){
+					if(this.formData.name=='' || this.formData.age=='' || this.formData.sex==''){
+						alert("姓名、年龄、性别不能为空");
+						return;
+					}else{
+						this.items.push(this.formData);
+						this.formData={
+							name:'',
+							age:'',
+							sex:''
+						}
+					}
+				},
+				reset(){
+					this.formData={
+						name:'',
+						age:'',
+						sex:''
+					}
+				},
+				edit(index){
+					this.isShow=true;
+					this.index=index;
+					this.modelData={
+						name:this.items[index].name,
+						age:this.items[index].age,
+						sex:this.items[index].sex
+					}
+				},
+				ok(index){
+					this.isShow=false;
+					this.index=index;
+					this.items[index]={
+						name:this.modelData.name,
+						age:this.modelData.age,
+						sex:this.modelData.sex
+					}
+					this.modelData={
+						name:'',
+						age:'',
+						sex:''
+					}
+				},
+				remove(index){
+					this.items.splice(index,1);
+				},
+				removeAll(){
+					this.items=[];
+				},
+				cancel(){
+					this.isShow=false;
+				}
+			}
+		})
+	</script>
+</body>
+</html>
